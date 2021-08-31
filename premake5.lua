@@ -1,7 +1,6 @@
 workspace "netlemon"
-    startproject "netlemoneditor"
     architecture "x64"
-
+    
     configurations
     {
         "Debug",
@@ -28,37 +27,32 @@ project "netlemon"
 
     files
     {
-        "%{prj.name}/include/**.h",
-        "%{prj.name}/src/**.h", 
-        "%{prj.name}/src/**.cpp"
+        "%{prj.name}/include/**.h"
     }
 
     sysincludedirs
     {
-        "%{prj.name}/include/netlemon",
+        "%{prj.name}/include",
+        "%{externals.asio}/include",
     }
-
-    flags { "FatalWarnings" }
 
     -- Windows
     filter {"system:windows", "configurations:*"}
         systemversion "latest" -- target latest windows upgrade when "cli gensln"
-        defines{ "LEMON_PLATFORM_WINDOWS" }
+        defines { "ASIO_STANDALONE" } 
 
     -- [CONFIGURATION DEFINES]: usually used to turn on optimization
     filter "configurations:Debug"
-        defines "LEMON_CONFIG_DEBUG"
         runtime "Debug"
         symbols "on" -- pdb symbols / for release we don't want them
 
     filter "configurations:Release"
-        defines "LEMON_CONFIG_RELEASE"
         runtime "Release"
         symbols "off"
         optimize "on"
-        
-project "netlemoneditor"
-    location "netlemoneditor"
+
+project "netservereditor"
+    location "netservereditor"
     kind "ConsoleApp"
     language "C++"
     cppdialect "C++17"
@@ -70,30 +64,61 @@ project "netlemoneditor"
 
     files
     {
-        "%{prj.name}/src/**.h",
         "%{prj.name}/src/**.cpp"
     }
 
     sysincludedirs 
     { 
         "netlemon/include",
-        "%{externals.asio}/include"
+        "%{externals.asio}/include",
     }
-
-    flags { "FatalWarnings" } 
 
     filter {"system:windows", "configurations:*"}
         systemversion "latest" -- target latest windows upgrade when "cli gensln"
-        defines{ "LEMON_PLATFORM_WINDOWS" }
+        defines { "ASIO_STANDALONE" } 
 
     -- [CONFIGURATION DEFINES]: usually used to turn on optimization
     filter "configurations:Debug"
-        defines "LEMON_CONFIG_DEBUG"
         runtime "Debug"
         symbols "on" -- pdb symbols / for release we don't want them
 
     filter "configurations:Release"
-        defines "LEMON_CONFIG_RELEASE"
+        runtime "Release"
+        symbols "off"
+        optimize "on"
+
+project "netclienteditor"
+    location "netclienteditor"
+    kind "ConsoleApp"
+    language "C++"
+    cppdialect "C++17"
+    staticruntime "on"
+    links "netlemon"
+
+    targetdir(tdir)
+    objdir(odir)
+
+    files
+    {
+        "%{prj.name}/src/**.cpp"
+    }
+
+    sysincludedirs 
+    { 
+        "netlemon/include",
+        "%{externals.asio}/include",
+    }
+
+    filter {"system:windows", "configurations:*"}
+        systemversion "latest" -- target latest windows upgrade when "cli gensln"
+        defines { "ASIO_STANDALONE" } 
+
+    -- [CONFIGURATION DEFINES]: usually used to turn on optimization
+    filter "configurations:Debug"
+        runtime "Debug"
+        symbols "on" -- pdb symbols / for release we don't want them
+
+    filter "configurations:Release"
         runtime "Release"
         symbols "off"
         optimize "on"
